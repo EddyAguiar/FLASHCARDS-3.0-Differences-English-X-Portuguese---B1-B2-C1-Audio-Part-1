@@ -1,0 +1,1176 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inglês por Níveis: B1, B2, C1 • Flashcards Interativos</title>
+    <style>
+        :root {
+            --bg: #f8fafc;
+            --card: #ffffff;
+            --accent: #3b82f6;
+            --muted: #64748b;
+            --b1: #10b981;      /* verde */
+            --b2: #3b82f6;       /* azul */
+            --c1: #8b5cf6;       /* roxo */
+            --practice: #f59e0b;  /* laranja */
+            --text: #1f2937;
+            --success: #10b981;
+            --error: #ef4444;
+        }
+        
+        * {
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--bg);
+            margin: 0;
+            padding: 20px;
+            color: var(--text);
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        h1 {
+            text-align: center;
+            margin: 0 0 10px;
+            color: var(--text);
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: var(--muted);
+            margin-bottom: 30px;
+            font-style: italic;
+        }
+        
+        .controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        
+        .controls label {
+            font-weight: 600;
+            color: var(--text);
+        }
+        
+        .controls input[type="range"] {
+            width: 180px;
+        }
+        
+        .categories {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 25px;
+            justify-content: center;
+        }
+        
+        .category-btn {
+            padding: 10px 18px;
+            border-radius: 20px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            color: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .category-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        
+        .b1-btn { background-color: var(--b1); }
+        .b2-btn { background-color: var(--b2); }
+        .c1-btn { background-color: var(--c1); }
+        .practice-btn { background-color: var(--practice); }
+        .all-btn { background-color: #475569; }
+        
+        .flashcards-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+        
+        .flashcard {
+            background: var(--card);
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-left: 6px solid;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .flashcard:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .flashcard.b1 { border-color: var(--b1); }
+        .flashcard.b2 { border-color: var(--b2); }
+        .flashcard.c1 { border-color: var(--c1); }
+        .flashcard.practice { border-color: var(--practice); }
+        
+        .flashcard-header {
+            font-weight: 600;
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .flashcard-header .left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .flashcard-header .emoji {
+            font-size: 1.5rem;
+        }
+        
+        .play-group {
+            display: flex;
+            gap: 5px;
+        }
+        
+        .play-btn {
+            border: none;
+            padding: 5px 8px;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 0.85rem;
+            color: white;
+            transition: all 0.2s;
+        }
+        
+        .play-btn:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+        
+        .play-btn.us { background: #dc2626; }
+        .play-btn.uk { background: #1e40af; }
+        
+        .content {
+            display: none;
+        }
+        
+        .content.active {
+            display: block;
+            animation: fadeIn 0.5s;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .question {
+            background: #f1f5f9;
+            padding: 12px;
+            border-radius: 8px;
+            font-weight: 500;
+            margin-bottom: 15px;
+            font-size: 1.05rem;
+        }
+        
+        .answer {
+            background: #dbeafe;
+            padding: 12px;
+            border-radius: 8px;
+            margin: 10px 0;
+            border-left: 3px solid var(--b2);
+        }
+        
+        .explanation {
+            background: #dcfce7;
+            padding: 12px;
+            border-radius: 8px;
+            margin: 10px 0;
+            border-left: 3px solid var(--b1);
+        }
+        
+        .examples {
+            background: #fffbeb;
+            padding: 12px;
+            border-radius: 8px;
+            margin: 10px 0;
+            border-left: 3px solid var(--c1);
+        }
+        
+        .practice-content {
+            background: #f0f9ff;
+            padding: 12px;
+            border-radius: 8px;
+            margin: 10px 0;
+            border-left: 3px solid var(--practice);
+        }
+        
+        .example-item {
+            margin-bottom: 8px;
+            position: relative;
+            padding-left: 20px;
+        }
+        
+        .example-item:before {
+            content: "→";
+            position: absolute;
+            left: 0;
+            color: var(--muted);
+        }
+        
+        .quiz-options {
+            list-style-type: none;
+            padding-left: 0;
+        }
+        
+        .quiz-options li {
+            margin-bottom: 8px;
+            padding: 10px;
+            background: #f8fafc;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 2px solid #e2e8f0;
+        }
+        
+        .quiz-options li:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        
+        .correct {
+            background: #bbf7d0 !important;
+            border-color: #16a34a !important;
+        }
+        
+        .incorrect {
+            background: #fecaca !important;
+            border-color: #dc2626 !important;
+        }
+        
+        .practice-answer {
+            padding: 10px;
+            background: #dbeafe;
+            border-radius: 6px;
+            margin-top: 8px;
+            display: none;
+        }
+        
+        .practice-answer.active {
+            display: block;
+            animation: fadeIn 0.5s;
+        }
+        
+        .show-answer {
+            background: var(--practice);
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 8px;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+        
+        .show-answer:hover {
+            background: #e07b0e;
+        }
+        
+        .tip {
+            background: #fef3c7;
+            padding: 12px;
+            border-radius: 6px;
+            margin: 10px 0;
+            font-size: 0.95rem;
+            border-left: 3px solid #f59e0b;
+        }
+        
+        .audio-examples {
+            margin-top: 10px;
+            padding: 10px;
+            background: #f8fafc;
+            border-radius: 8px;
+        }
+        
+        .audio-examples .example-audio {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        
+        .example-text {
+            flex: 1;
+            font-size: 0.95rem;
+        }
+        
+        .step-badge {
+            font-size: 0.9rem;
+            padding: 4px 8px;
+            border-radius: 999px;
+            background: #f3f4f6;
+            color: #374151;
+            font-weight: 700;
+            display: inline-block;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .score-bar {
+            position: fixed;
+            right: 20px;
+            bottom: 20px;
+            background: #0f172a;
+            color: white;
+            padding: 12px 16px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(2, 6, 23, 0.3);
+            z-index: 999;
+            min-width: 190px;
+        }
+        
+        .score-bar .title {
+            font-weight: 700;
+            margin-bottom: 6px;
+            font-size: 0.95rem;
+        }
+        
+        .score-bar .value {
+            font-size: 1rem;
+            font-weight: 800;
+            color: #34d399;
+        }
+        
+        .score-bar button {
+            margin-top: 8px;
+            background: #111827;
+            color: white;
+            border: none;
+            padding: 8px 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            width: 100%;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 20px;
+            color: var(--muted);
+            font-size: 0.9rem;
+            border-top: 1px solid #e2e8f0;
+        }
+        
+        @media (max-width: 768px) {
+            .flashcards-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .categories {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .category-btn {
+                width: 90%;
+            }
+            
+            .score-bar {
+                position: relative;
+                right: auto;
+                bottom: auto;
+                margin: 20px auto;
+                width: 90%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📚 Inglês por Níveis: B1, B2, C1</h1>
+        <div class="subtitle">Flashcards organizados por nível de proficiência com explicações em português</div>
+        
+        <div class="controls">
+            <label for="voiceRate">Velocidade do áudio:</label>
+            <input id="voiceRate" type="range" min="0.6" max="1.4" step="0.05" value="1.0">
+        </div>
+        
+        <div class="categories">
+            <button class="category-btn b1-btn" onclick="filterCards('b1')">🟢 B1 - Intermediário</button>
+            <button class="category-btn b2-btn" onclick="filterCards('b2')">🔵 B2 - Intermediário Superior</button>
+            <button class="category-btn c1-btn" onclick="filterCards('c1')">🟣 C1 - Avançado</button>
+            <button class="category-btn practice-btn" onclick="filterCards('practice')">📝 Prática Geral</button>
+            <button class="category-btn all-btn" onclick="filterCards('all')">🔄 Todos</button>
+        </div>
+        
+        <div class="flashcards-container" id="flashcards-container">
+            <!-- ================= NÍVEL B1 ================= -->
+            <!-- B1 - Present Perfect vs Past Simple -->
+            <div class="flashcard b1" onclick="revealContent(this)">
+                <div class="flashcard-header">
+                    <div class="left">
+                        <span class="emoji">🟢</span>
+                        <span class="step-badge">B1 • PRESENT PERFECT X PAST SIMPLE</span>
+                    </div>
+                    <div class="play-group">
+                        <button class="play-btn us" onclick="playTTS(event, 'I have visited Paris. I visited Paris last year.')">US 🔊</button>
+                        <button class="play-btn uk" onclick="playTTS(event, 'I have visited Paris. I visited Paris last year.', 'uk')">UK 🔊</button>
+                    </div>
+                </div>
+                <div class="content">
+                    <div class="question">Qual a diferença entre "I have visited Paris" e "I visited Paris"?</div>
+                    <div class="content">
+                        <div class="answer">✅ <strong>Present Perfect</strong> (have visited) conecta passado com presente. <strong>Past Simple</strong> (visited) indica ação concluída em um momento específico.</div>
+                        <div class="content">
+                            <div class="explanation">Em português, muitas vezes usamos o mesmo tempo. Em inglês, o Present Perfect é usado quando o tempo não é importante ou a ação ainda tem relevância.</div>
+                            <div class="content">
+                                <div class="examples">
+                                    <p><strong>Exemplos:</strong></p>
+                                    <div class="example-item">
+                                        "I have lost my keys." (Perdi as chaves – e ainda não as encontrei.)
+                                        <div class="audio-examples">
+                                            <div class="example-audio">
+                                                <span class="example-text">"I have lost my keys."</span>
+                                                <button class="play-btn us" onclick="playTTS(event, 'I have lost my keys.')">US 🔊</button>
+                                                <button class="play-btn uk" onclick="playTTS(event, 'I have lost my keys.', 'uk')">UK 🔊</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="example-item">
+                                        "I lost my keys yesterday." (Perdi ontem – ação concluída.)
+                                        <div class="audio-examples">
+                                            <div class="example-audio">
+                                                <span class="example-text">"I lost my keys yesterday."</span>
+                                                <button class="play-btn us" onclick="playTTS(event, 'I lost my keys yesterday.')">US 🔊</button>
+                                                <button class="play-btn uk" onclick="playTTS(event, 'I lost my keys yesterday.', 'uk')">UK 🔊</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- B1 - First Conditional -->
+            <div class="flashcard b1" onclick="revealContent(this)">
+                <div class="flashcard-header">
+                    <div class="left">
+                        <span class="emoji">🟢</span>
+                        <span class="step-badge">B1 • FIRST CONDITIONAL</span>
+                    </div>
+                    <div class="play-group">
+                        <button class="play-btn us" onclick="playTTS(event, 'If it rains, I will stay home.')">US 🔊</button>
+                        <button class="play-btn uk" onclick="playTTS(event, 'If it rains, I will stay home.', 'uk')">UK 🔊</button>
+                    </div>
+                </div>
+                <div class="content">
+                    <div class="question">Como formar a First Conditional?</div>
+                    <div class="content">
+                        <div class="answer">✅ <strong>If + present simple, will + infinitivo</strong> (para situações reais ou prováveis no futuro).</div>
+                        <div class="content">
+                            <div class="explanation">Equivalente ao "se... então" em português, mas com tempos verbais diferentes: em português usamos futuro do subjuntivo (se chover) e futuro do presente (ficarei).</div>
+                            <div class="content">
+                                <div class="examples">
+                                    <p><strong>Exemplos:</strong></p>
+                                    <div class="example-item">
+                                        "If you study, you will pass." (Se você estudar, passará.)
+                                        <div class="audio-examples">
+                                            <div class="example-audio">
+                                                <span class="example-text">"If you study, you will pass."</span>
+                                                <button class="play-btn us" onclick="playTTS(event, 'If you study, you will pass.')">US 🔊</button>
+                                                <button class="play-btn uk" onclick="playTTS(event, 'If you study, you will pass.', 'uk')">UK 🔊</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- B1 - Modal Verbs (should/must) -->
+            <div class="flashcard b1" onclick="revealContent(this)">
+                <div class="flashcard-header">
+                    <div class="left">
+                        <span class="emoji">🟢</span>
+                        <span class="step-badge">B1 • MODALS: SHOULD X MUST</span>
+                    </div>
+                    <div class="play-group">
+                        <button class="play-btn us" onclick="playTTS(event, 'You should see a doctor. You must wear a seatbelt.')">US 🔊</button>
+                        <button class="play-btn uk" onclick="playTTS(event, 'You should see a doctor. You must wear a seatbelt.', 'uk')">UK 🔊</button>
+                    </div>
+                </div>
+                <div class="content">
+                    <div class="question">Qual a diferença entre "should" e "must"?</div>
+                    <div class="content">
+                        <div class="answer">✅ <strong>Should</strong> = recomendação/conselho. <strong>Must</strong> = obrigação (mais forte).</div>
+                        <div class="content">
+                            <div class="explanation">Em português, "deveria" vs "deve". "Must" é usado para regras ou necessidade forte.</div>
+                            <div class="content">
+                                <div class="examples">
+                                    <div class="example-item">
+                                        "You should exercise." (Você deveria se exercitar.)
+                                        <div class="audio-examples">
+                                            <div class="example-audio">
+                                                <span class="example-text">"You should exercise."</span>
+                                                <button class="play-btn us" onclick="playTTS(event, 'You should exercise.')">US 🔊</button>
+                                                <button class="play-btn uk" onclick="playTTS(event, 'You should exercise.', 'uk')">UK 🔊</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="example-item">
+                                        "You must stop at the red light." (Você deve parar no sinal vermelho.)
+                                        <div class="audio-examples">
+                                            <div class="example-audio">
+                                                <span class="example-text">"You must stop at the red light."</span>
+                                                <button class="play-btn us" onclick="playTTS(event, 'You must stop at the red light.')">US 🔊</button>
+                                                <button class="play-btn uk" onclick="playTTS(event, 'You must stop at the red light.', 'uk')">UK 🔊</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- B1 - Phrasal Verbs comuns -->
+            <div class="flashcard b1" onclick="revealContent(this)">
+                <div class="flashcard-header">
+                    <div class="left">
+                        <span class="emoji">🟢</span>
+                        <span class="step-badge">B1 • PHRASAL VERBS</span>
+                    </div>
+                    <div class="play-group">
+                        <button class="play-btn us" onclick="playTTS(event, 'Please turn off the light. I get up at 7 am.')">US 🔊</button>
+                        <button class="play-btn uk" onclick="playTTS(event, 'Please turn off the light. I get up at 7 am.', 'uk')">UK 🔊</button>
+                    </div>
+                </div>
+                <div class="content">
+                    <div class="question">O que são phrasal verbs?</div>
+                    <div class="content">
+                        <div class="answer">✅ Verbos compostos por verbo + preposição ou advérbio, com significado diferente do verbo original.</div>
+                        <div class="content">
+                            <div class="explanation">Ex: "get up" (levantar-se), "turn off" (desligar). Em português, usamos verbos diferentes.</div>
+                            <div class="content">
+                                <div class="examples">
+                                    <div class="example-item">
+                                        "I need to <strong>look after</strong> my sister." (cuidar de)
+                                        <div class="audio-examples">
+                                            <div class="example-audio">
+                                                <span class="example-text">"I need to look after my sister."</span>
+                                                <button class="play-btn us" onclick="playTTS(event, 'I need to look after my sister.')">US 🔊</button>
+                                                <button class="play-btn uk" onclick="playTTS(event, 'I need to look after my sister.', 'uk')">UK 🔊</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="example-item">
+                                        "They <strong>gave up</strong> smoking." (desistiram de)
+                                        <div class="audio-examples">
+                                            <div class="example-audio">
+                                                <span class="example-text">"They gave up smoking."</span>
+                                                <button class="play-btn us" onclick="playTTS(event, 'They gave up smoking.')">US 🔊</button>
+                                                <button class="play-btn uk" onclick="playTTS(event, 'They gave up smoking.', 'uk')">UK 🔊</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- ================= NÍVEL B2 ================= -->
+            <!-- B2 - Second Conditional -->
+            <div class="flashcard b2" onclick="revealContent(this)">
+                <div class="flashcard-header">
+                    <div class="left">
+                        <span class="emoji">🔵</span>
+                        <span class="step-badge">B2 • SECOND CONDITIONAL</span>
+                    </div>
+                    <div class="play-group">
+                        <button class="play-btn us" onclick="playTTS(event, 'If I won the lottery, I would travel the world.')">US 🔊</button>
+                        <button class="play-btn uk" onclick="playTTS(event, 'If I won the lottery, I would travel the world.', 'uk')">UK 🔊</button>
+                    </div>
+                </div>
+                <div class="content">
+                    <div class="question">Como formar a Second Conditional?</div>
+                    <div class="content">
+                        <div class="answer">✅ <strong>If + past simple, would + infinitivo</strong> (para situações hipotéticas ou improváveis).</div>
+                        <div class="content">
+                            <div class="explanation">Diferente do português, usamos o passado no "if" para indicar irrealidade, mas o significado é de presente/futuro.</div>
+                            <div class="content">
+                                <div class="examples">
+                                    <div class="example-item">
+                                        "If I were you, I would accept." (Se eu fosse você, aceitaria.)
+                                        <div class="audio-examples">
+                                            <div class="example-audio">
+                                                <span class="example-text">"If I were you, I would accept."</span>
+                                                <button class="play-btn us" onclick="playTTS(event, 'If I were you, I would accept.')">US 🔊</button>
+                                                <button class="play-btn uk" onclick="playTTS(event, 'If I were you, I would accept.', 'uk')">UK 🔊</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- B2 - Passive Voice -->
+            <div class="flashcard b2" onclick="revealContent(this)">
+                <div class="flashcard-header">
+                    <div class="left">
+                        <span class="emoji">🔵</span>
+                        <span class="step-badge">B2 • PASSIVE VOICE</span>
+                    </div>
+                    <div class="play-group">
+                        <button class="play-btn us" onclick="playTTS(event, 'The cake was eaten by the children.')">US 🔊</button>
+                        <button class="play-btn uk" onclick="playTTS(event, 'The cake was eaten by the children.', 'uk')">UK 🔊</button>
+                    </div>
+                </div>
+                <div class="content">
+                    <div class="question">Como formar a voz passiva?</div>
+                    <div class="content">
+                        <div class="answer">✅ <strong>to be + particípio passado</strong>. O objeto da ativa vira sujeito da passiva.</div>
+                        <div class="content">
+                            <div class="explanation">Em português, usamos "ser" + particípio. Em inglês, a estrutura é similar, mas com mais tempos verbais.</div>
+                            <div class="content">
+                                <div class="examples">
+                                    <div class="example-item">
+                                        "The letter was sent yesterday." (A carta foi enviada ontem.)
+                                        <div class="audio-examples">
+                                            <div class="example-audio">
+                                                <span class="example-text">"The letter was sent yesterday."</span>
+                                                <button class="play-btn us" onclick="playTTS(event, 'The letter was sent yesterday.')">US 🔊</button>
+                                                <button class="play-btn uk" onclick="playTTS(event, 'The letter was sent yesterday.', 'uk')">UK 🔊</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- B2 - Reported Speech -->
+            <div class="flashcard b2" onclick="revealContent(this)">
+                <div class="flashcard-header">
+                    <div class="left">
+                        <span class="emoji">🔵</span>
+                        <span class="step-badge">B2 • REPORTED SPEECH</span>
+                    </div>
+                    <div class="play-group">
+                        <button class="play-btn us" onclick="playTTS(event, 'She said she was tired.')">US 🔊</button>
+                        <button class="play-btn uk" onclick="playTTS(event, 'She said she was tired.', 'uk')">UK 🔊</button>
+                    </div>
+                </div>
+                <div class="content">
+                    <div class="question">Como transformar "I am tired" em discurso indireto?</div>
+                    <div class="content">
+                        <div class="answer">✅ "She said (that) she was tired." – O verbo volta um tempo (presente vira passado).</div>
+                        <div class="content">
+                            <div class="explanation">Em português também mudamos os tempos, mas em inglês as regras são mais sistemáticas.</div>
+                            <div class="content">
+                                <div class="examples">
+                                    <div class="example-item">
+                                        "He said, 'I will call you.'" → "He said he would call me."
+                                        <div class="audio-examples">
+                                            <div class="example-audio">
+                                                <span class="example-text">"He said he would call me."</span>
+                                                <button class="play-btn us" onclick="playTTS(event, 'He said he would call me.')">US 🔊</button>
+                                                <button class="play-btn uk" onclick="playTTS(event, 'He said he would call me.', 'uk')">UK 🔊</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- B2 - Modal Perfects (should have) -->
+            <div class="flashcard b2" onclick="revealContent(this)">
+                <div class="flashcard-header">
+                    <div class="left">
+                        <span class="emoji">🔵</span>
+                        <span class="step-badge">B2 • MODAL PERFECTS</span>
+                    </div>
+                    <div class="play-group">
+                        <button class="play-btn us" onclick="playTTS(event, 'You should have studied.')">US 🔊</button>
+                        <button class="play-btn uk" onclick="playTTS(event, 'You should have studied.', 'uk')">UK 🔊</button>
+                    </div>
+                </div>
+                <div class="content">
+                    <div class="question">O que significa "should have done"?</div>
+                    <div class="content">
+                        <div class="answer">✅ Indica arrependimento ou crítica sobre algo que não aconteceu no passado.</div>
+                        <div class="content">
+                            <div class="explanation">Equivalente a "deveria ter feito" em português.</div>
+                            <div class="content">
+                                <div class="examples">
+                                    <div class="example-item">
+                                        "I should have called you." (Eu deveria ter te ligado.)
+                                        <div class="audio-examples">
+                                            <div class="example-audio">
+                                                <span class="example-text">"I should have called you."</span>
+                                                <button class="play-btn us" onclick="playTTS(event, 'I should have called you.')">US 🔊</button>
+                                                <button class="play-btn uk" onclick="playTTS(event, 'I should have called you.', 'uk')">UK 🔊</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- ================= NÍVEL C1 ================= -->
+            <!-- C1 - Inversion -->
+            <div class="flashcard c1" onclick="revealContent(this)">
+                <div class="flashcard-header">
+                    <div class="left">
+                        <span class="emoji">🟣</span>
+                        <span class="step-badge">C1 • INVERSION</span>
+                    </div>
+                    <div class="play-group">
+                        <button class="play-btn us" onclick="playTTS(event, 'Never have I seen such a beautiful sunset.')">US 🔊</button>
+                        <button class="play-btn uk" onclick="playTTS(event, 'Never have I seen such a beautiful sunset.', 'uk')">UK 🔊</button>
+                    </div>
+                </div>
+                <div class="content">
+                    <div class="question">O que é inversão e quando usá-la?</div>
+                    <div class="content">
+                        <div class="answer">✅ Inversão é colocar o verbo auxiliar antes do sujeito para dar ênfase, geralmente após expressões negativas ou "only".</div>
+                        <div class="content">
+                            <div class="explanation">Em português, usamos estrutura normal com entonação. Em inglês, é uma construção formal.</div>
+                            <div class="content">
+                                <div class="examples">
+                                    <div class="example-item">
+                                        "Not only did she arrive late, but she also forgot the documents."
+                                        <div class="audio-examples">
+                                            <div class="example-audio">
+                                                <span class="example-text">"Not only did she arrive late, but she also forgot the documents."</span>
+                                                <button class="play-btn us" onclick="playTTS(event, 'Not only did she arrive late, but she also forgot the documents.')">US 🔊</button>
+                                                <button class="play-btn uk" onclick="playTTS(event, 'Not only did she arrive late, but she also forgot the documents.', 'uk')">UK 🔊</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- C1 - Mixed Conditionals -->
+            <div class="flashcard c1" onclick="revealContent(this)">
+                <div class="flashcard-header">
+                    <div class="left">
+                        <span class="emoji">🟣</span>
+                        <span class="step-badge">C1 • MIXED CONDITIONALS</span>
+                    </div>
+                    <div class="play-group">
+                        <button class="play-btn us" onclick="playTTS(event, 'If I had studied, I would have a better job now.')">US 🔊</button>
+                        <button class="play-btn uk" onclick="playTTS(event, 'If I had studied, I would have a better job now.', 'uk')">UK 🔊</button>
+                    </div>
+                </div>
+                <div class="content">
+                    <div class="question">O que são mixed conditionals?</div>
+                    <div class="content">
+                        <div class="answer">✅ Combinam diferentes tempos: condição no passado com resultado no presente, ou vice-versa.</div>
+                        <div class="content">
+                            <div class="explanation">Exemplo: "If I had studied (passado), I would have a better job now (presente)."</div>
+                            <div class="content">
+                                <div class="examples">
+                                    <div class="example-item">
+                                        "She would be here if she hadn't missed the bus." (Ela estaria aqui se não tivesse perdido o ônibus.)
+                                        <div class="audio-examples">
+                                            <div class="example-audio">
+                                                <span class="example-text">"She would be here if she hadn't missed the bus."</span>
+                                                <button class="play-btn us" onclick="playTTS(event, 'She would be here if she hadn\'t missed the bus.')">US 🔊</button>
+                                                <button class="play-btn uk" onclick="playTTS(event, 'She would be here if she hadn\'t missed the bus.', 'uk')">UK 🔊</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- C1 - Cleft Sentences -->
+            <div class="flashcard c1" onclick="revealContent(this)">
+                <div class="flashcard-header">
+                    <div class="left">
+                        <span class="emoji">🟣</span>
+                        <span class="step-badge">C1 • CLEFT SENTENCES</span>
+                    </div>
+                    <div class="play-group">
+                        <button class="play-btn us" onclick="playTTS(event, 'It was John who called.')">US 🔊</button>
+                        <button class="play-btn uk" onclick="playTTS(event, 'It was John who called.', 'uk')">UK 🔊</button>
+                    </div>
+                </div>
+                <div class="content">
+                    <div class="question">O que é uma cleft sentence?</div>
+                    <div class="content">
+                        <div class="answer">✅ Estrutura que divide uma frase para enfatizar uma parte: "It + be + elemento enfatizado + who/that..."</div>
+                        <div class="content">
+                            <div class="explanation">Em português, usamos "foi... que". Ex: "Foi João quem ligou."</div>
+                            <div class="content">
+                                <div class="examples">
+                                    <div class="example-item">
+                                        "What I need is a vacation." (O que eu preciso é de férias.)
+                                        <div class="audio-examples">
+                                            <div class="example-audio">
+                                                <span class="example-text">"What I need is a vacation."</span>
+                                                <button class="play-btn us" onclick="playTTS(event, 'What I need is a vacation.')">US 🔊</button>
+                                                <button class="play-btn uk" onclick="playTTS(event, 'What I need is a vacation.', 'uk')">UK 🔊</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- C1 - Hedging Language -->
+            <div class="flashcard c1" onclick="revealContent(this)">
+                <div class="flashcard-header">
+                    <div class="left">
+                        <span class="emoji">🟣</span>
+                        <span class="step-badge">C1 • HEDGING</span>
+                    </div>
+                    <div class="play-group">
+                        <button class="play-btn us" onclick="playTTS(event, 'It seems that the results are positive.')">US 🔊</button>
+                        <button class="play-btn uk" onclick="playTTS(event, 'It seems that the results are positive.', 'uk')">UK 🔊</button>
+                    </div>
+                </div>
+                <div class="content">
+                    <div class="question">O que é hedging?</div>
+                    <div class="content">
+                        <div class="answer">✅ Uso de linguagem cautelosa para evitar afirmações absolutas (ex: "seems", "tends to", "could be").</div>
+                        <div class="content">
+                            <div class="explanation">Comum em textos acadêmicos e formais para suavizar afirmações.</div>
+                            <div class="content">
+                                <div class="examples">
+                                    <div class="example-item">
+                                        "This might suggest that..." (Isto pode sugerir que...)
+                                        <div class="audio-examples">
+                                            <div class="example-audio">
+                                                <span class="example-text">"This might suggest that..."</span>
+                                                <button class="play-btn us" onclick="playTTS(event, 'This might suggest that...')">US 🔊</button>
+                                                <button class="play-btn uk" onclick="playTTS(event, 'This might suggest that...', 'uk')">UK 🔊</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- ================= PRÁTICA GERAL ================= -->
+            <!-- Practice 1: B1 -->
+            <div class="flashcard practice" onclick="revealContent(this)">
+                <div class="flashcard-header">
+                    <div class="left">
+                        <span class="emoji">📝</span>
+                        <span class="step-badge">PRÁTICA • B1</span>
+                    </div>
+                </div>
+                <div class="content">
+                    <div class="question">Complete com o tempo verbal correto: "I ___ (never / be) to London."</div>
+                    <div class="content">
+                        <div class="practice-content">
+                            <ul class="quiz-options">
+                                <li onclick="checkAnswer(this, 'have never been')">have never been</li>
+                                <li onclick="checkAnswer(this, 'never went')">never went</li>
+                                <li onclick="checkAnswer(this, 'never was')">never was</li>
+                            </ul>
+                            <div class="practice-answer"><span style="color: #10b981;">✅</span> <strong>have never been</strong> – Present Perfect para experiências de vida.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Practice 2: B2 -->
+            <div class="flashcard practice" onclick="revealContent(this)">
+                <div class="flashcard-header">
+                    <div class="left">
+                        <span class="emoji">📝</span>
+                        <span class="step-badge">PRÁTICA • B2</span>
+                    </div>
+                </div>
+                <div class="content">
+                    <div class="question">Transforme para a voz passiva: "They built this house in 1990."</div>
+                    <div class="content">
+                        <div class="practice-content">
+                            <ul class="quiz-options">
+                                <li onclick="checkAnswer(this, 'This house was built in 1990.')">This house was built in 1990.</li>
+                                <li onclick="checkAnswer(this, 'This house is built in 1990.')">This house is built in 1990.</li>
+                                <li onclick="checkAnswer(this, 'This house were built in 1990.')">This house were built in 1990.</li>
+                            </ul>
+                            <div class="practice-answer"><span style="color: #10b981;">✅</span> <strong>This house was built in 1990.</strong></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Practice 3: C1 -->
+            <div class="flashcard practice" onclick="revealContent(this)">
+                <div class="flashcard-header">
+                    <div class="left">
+                        <span class="emoji">📝</span>
+                        <span class="step-badge">PRÁTICA • C1</span>
+                    </div>
+                </div>
+                <div class="content">
+                    <div class="question">Reescreva com inversão: "I have never seen such a mess."</div>
+                    <div class="content">
+                        <div class="practice-content">
+                            <ul class="quiz-options">
+                                <li onclick="checkAnswer(this, 'Never have I seen such a mess.')">Never have I seen such a mess.</li>
+                                <li onclick="checkAnswer(this, 'Never I have seen such a mess.')">Never I have seen such a mess.</li>
+                                <li onclick="checkAnswer(this, 'I never have seen such a mess.')">I never have seen such a mess.</li>
+                            </ul>
+                            <div class="practice-answer"><span style="color: #10b981;">✅</span> <strong>Never have I seen such a mess.</strong></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Dica final -->
+            <div class="flashcard practice" onclick="revealContent(this)">
+                <div class="flashcard-header">
+                    <div class="left">
+                        <span class="emoji">💡</span>
+                        <span class="step-badge">DICA DE ESTUDO</span>
+                    </div>
+                </div>
+                <div class="content">
+                    <div class="question">Como evoluir do B1 para o C1?</div>
+                    <div class="content">
+                        <div class="answer">✅ Pratique listening com nativos, leia textos acadêmicos e escreva redações. Use os flashcards diariamente.</div>
+                        <div class="content">
+                            <div class="tip">
+                                <p><strong>Lembre-se:</strong> Cada nível exige domínio de estruturas mais complexas. O importante é a consistência.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="score-bar" id="scoreBar">
+        <div class="title">Pontuação da Prática</div>
+        <div>Corretas: <span class="value" id="scoreCorrect">0</span> / <span id="scoreTotal">3</span></div>
+        <button onclick="resetScore()">Zerar</button>
+    </div>
+    
+    <footer>
+        Material criado para estudo dos níveis B1, B2 e C1 • Comparações com o português<br>
+        <span class="copyright">© @InglêsFácilGratuito</span>
+    </footer>
+
+    <script>
+        // Sistema de revelar conteúdo
+        function revealContent(card) {
+            const contents = card.querySelectorAll('.content');
+            let foundActive = false;
+            
+            contents.forEach(content => {
+                if (!foundActive && !content.classList.contains('active')) {
+                    content.classList.add('active');
+                    foundActive = true;
+                } else if (foundActive) {
+                    content.classList.remove('active');
+                }
+            });
+            
+            // Se todos estão ativos, reseta
+            if (!foundActive) {
+                contents.forEach(content => {
+                    content.classList.remove('active');
+                });
+                contents[0].classList.add('active');
+            }
+        }
+        
+        // Sistema de respostas de prática
+        function toggleAnswer(button) {
+            const answer = button.nextElementSibling;
+            answer.classList.toggle('active');
+            event.stopPropagation();
+        }
+        
+        let scoreCorrect = 0;
+        const scoreTotal = 3; // 3 practice questions
+        const scoreCorrectEl = document.getElementById('scoreCorrect');
+        const scoreTotalEl = document.getElementById('scoreTotal');
+        
+        scoreTotalEl.textContent = scoreTotal;
+        
+        function checkAnswer(element, correctAnswer) {
+            const optionText = element.textContent.trim();
+            const isCorrect = optionText === correctAnswer;
+            
+            // Remove classes anteriores
+            const parent = element.parentElement;
+            const options = parent.querySelectorAll('li');
+            options.forEach(opt => {
+                opt.classList.remove('correct', 'incorrect');
+            });
+            
+            // Marca a resposta selecionada
+            if (isCorrect) {
+                element.classList.add('correct');
+                scoreCorrect++;
+                scoreCorrectEl.textContent = scoreCorrect;
+            } else {
+                element.classList.add('incorrect');
+                
+                // Marca a resposta correta
+                options.forEach(opt => {
+                    if (opt.textContent.trim() === correctAnswer) {
+                        opt.classList.add('correct');
+                    }
+                });
+            }
+            
+            // Mostra a resposta explicada
+            const answerElement = parent.nextElementSibling;
+            if (answerElement && answerElement.classList.contains('practice-answer')) {
+                answerElement.classList.add('active');
+            }
+            
+            event.stopPropagation();
+        }
+        
+        function resetScore() {
+            scoreCorrect = 0;
+            scoreCorrectEl.textContent = scoreCorrect;
+            
+            const allOptions = document.querySelectorAll('.quiz-options li');
+            allOptions.forEach(option => {
+                option.classList.remove('correct', 'incorrect');
+            });
+            
+            const practiceAnswers = document.querySelectorAll('.practice-answer');
+            practiceAnswers.forEach(answer => {
+                answer.classList.remove('active');
+            });
+        }
+        
+        // Sistema de filtro por nível
+        function filterCards(category) {
+            const cards = document.querySelectorAll('.flashcard');
+            
+            cards.forEach(card => {
+                if (category === 'all') {
+                    card.classList.remove('hidden');
+                } else if (card.classList.contains(category)) {
+                    card.classList.remove('hidden');
+                } else {
+                    card.classList.add('hidden');
+                }
+            });
+        }
+        
+        // Sistema TTS
+        const synth = window.speechSynthesis;
+        let voices = [];
+        
+        function loadVoices() {
+            voices = synth.getVoices();
+        }
+        
+        loadVoices();
+        
+        if (speechSynthesis.onvoiceschanged !== undefined) {
+            speechSynthesis.onvoiceschanged = loadVoices;
+        }
+        
+        function getVoice(region) {
+            if (!voices.length) loadVoices();
+            if (region === 'us') {
+                return voices.find(v => v.lang === 'en-US') || 
+                       voices.find(v => /US/i.test(v.name)) || 
+                       voices[0];
+            } else {
+                return voices.find(v => v.lang === 'en-GB') || 
+                       voices.find(v => /UK|British/i.test(v.name)) || 
+                       voices[0];
+            }
+        }
+        
+        function playTTS(event, text, region = 'us') {
+            event.stopPropagation();
+            synth.cancel();
+            
+            const rate = parseFloat(document.getElementById('voiceRate').value) || 1.0;
+            const utterance = new SpeechSynthesisUtterance(text);
+            const voice = getVoice(region);
+            
+            utterance.voice = voice;
+            utterance.lang = (region === 'us') ? 'en-US' : 'en-GB';
+            utterance.rate = rate;
+            
+            synth.speak(utterance);
+        }
+        
+        // Inicializar alguns cartões abertos
+        document.addEventListener('DOMContentLoaded', function() {
+            // Abre o primeiro card de cada nível para exemplo
+            const firstCards = document.querySelectorAll('.flashcard.b1, .flashcard.b2, .flashcard.c1');
+            firstCards.forEach((card, index) => {
+                if (index < 3) { // só alguns
+                    const firstContent = card.querySelector('.content');
+                    if (firstContent) firstContent.classList.add('active');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
